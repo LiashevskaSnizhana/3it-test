@@ -1,0 +1,48 @@
+version: "3.8"
+services:
+    php:
+        user: ${HOST_USER_ID}:1000
+        build:
+            context: ./Docker/
+            args:
+                - HOST_USER_ID=${HOST_USER_ID}
+        container_name: symfony-skeleton_php
+        working_dir: /var/www/
+        volumes:
+            - ./:/var/www:cached
+        networks:
+            - symfony-skeleton-network
+
+    db:
+        image: mariadb:10.5
+        container_name: symfony-skeleton_db
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+        env_file:
+            - ./.env
+        volumes:
+            - symfony-skeleton-mysql-data:/var/lib/mysql
+        networks:
+            - symfony-skeleton-network
+
+    nginx:
+        image: nginx:alpine
+        container_name: symfony-skeleton_nginx
+        ports:
+            - ${NGINX_EXPOSE_PORT}:80
+        volumes:
+            - ./:/var/www
+            - ./Docker/nginx/conf.d/:/etc/nginx/conf.d/
+        networks:
+            - symfony-skeleton-network
+
+volumes:
+    symfony-skeleton-mysql-data:
+    symfony-skeleton-es-data:
+
+networks:
+    symfony-skeleton-network:
+        driver: bridge
