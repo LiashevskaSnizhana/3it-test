@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Notice;
+use App\Form\XmlUploadForm;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -22,39 +23,13 @@ class NoticeController extends \Symfony\Bundle\FrameworkBundle\Controller\Abstra
         EntityManagerInterface $entityManager
     ): \Symfony\Component\HttpFoundation\Response
     {
-        $xmlUploadForm = $this->createFormBuilder()
-            ->add('xmlFile', FileType::class,
-                [
-                    'label' => 'Notices (XML file)',
-                    'mapped' => false,
-                    'required' => true,
-
-                    'constraints' => [
-                        new File([
-                            'maxSize' => '1024k',
-                            'mimeTypes' => ['text/xml', 'application/xml'],
-                            'mimeTypesMessage' => 'Please upload a valid XML document',
-                        ])
-                    ],
-            ])
-            ->add('save', SubmitType::class, ['label' => 'Upload'])
-            ->getForm();
+        $xmlUploadForm = $this->createForm( XmlUploadForm::class);
 
         $xmlUploadForm->handleRequest($request);
         if ($xmlUploadForm->isSubmitted() && $xmlUploadForm->isValid()) {
             $xmlFile = $xmlUploadForm->get('xmlFile')->getData();
             $xmlFileName = 'xml';
-
-            if ($xmlFile) {
-                try {
-                    $xmlFile->move(
-                       './',
-                        $xmlFileName
-                    );
-                } catch (FileException $e) {
-                    throw new \Exception("File couldn't be move.");
-                }
-            }
+            file_put_contents($xmlFileName, file_get_contents($xmlFile));
 
             if (\file_exists($xmlFileName)) {
                 $xmlFile = \simplexml_load_file($xmlFileName);
