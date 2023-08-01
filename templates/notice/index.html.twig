@@ -1,0 +1,66 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}
+    Notice
+{% endblock %}
+
+{% block content %}
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Notice</h3>
+
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"
+                                        title="Collapse">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            {{ form(xmlUploadForm) }}
+                            <table class="table table-hover" id="noticeTable">
+                                <thead>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">Jméno</th>
+                                    <th scope="col">Příjmení</th>
+                                    <th scope="col">Datum</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for notice in notices %}
+                                    <tr class="clickable-row">
+                                        <td>{{ notice.id }}</td>
+                                        <td>{{ notice.firstName }}</td>
+                                        <td>{{ notice.lastName }}</td>
+                                        <td>{{ notice.date|date("Y-m-d")}}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block scripts %}
+    {{ parent() }}
+    <script>
+        $(".clickable-row").click(function() {
+            if ($(this).hasClass('bg-primary') === true) {
+                $(this).removeClass("bg-primary");
+            } else {
+                $(this).addClass("bg-primary");
+            }
+        });
+    </script>
+{% endblock %}
